@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ "Sửa người dùng" if user else "Tạo người dùng" }} - Task Flow{% endblock %}
+
+{% block content %}
+<section class="form-shell">
+    <form method="post" class="form-card wide">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <h1>{{ "Sửa người dùng" if user else "Tạo người dùng" }}</h1>
+
+        <label for="full_name">Họ tên <span class="required">*</span></label>
+        <input id="full_name" name="full_name" value="{{ user.full_name if user else prefill.get('full_name', '') }}" placeholder="Nhập họ tên người dùng" required>
+
+        <label for="email">Email <span class="required">*</span></label>
+        <input id="email" name="email" type="email" value="{{ user.email if user else prefill.get('email', '') }}" placeholder="email@example.com" required>
+
+        <label for="password">
+            {% if user %}
+                Mật khẩu mới <small style="color:var(--muted);font-weight:400;">(để trống nếu không đổi)</small>
+            {% else %}
+                Mật khẩu <span class="required">*</span>
+            {% endif %}
+        </label>
+        <input id="password" name="password" type="password"
+               placeholder="{{ 'Nhập mật khẩu mới...' if user else 'Nhập mật khẩu' }}"
+               {% if not user %}required{% endif %}>
+
+        <label for="confirm_password">
+            {% if user %}
+                Xác nhận mật khẩu mới <small style="color:var(--muted);font-weight:400;">(để trống nếu không đổi)</small>
+            {% else %}
+                Xác nhận mật khẩu <span class="required">*</span>
+            {% endif %}
+        </label>
+        <input id="confirm_password"
+               name="confirm_password"
+               type="password"
+               placeholder="Nhập lại mật khẩu"
+               {% if not user %}required{% endif %}>
+
+        <div class="form-grid">
+            <div>
+                <label for="role">Vai trò</label>
+                <select id="role" name="role">
+                    {% for role in roles %}
+                        <option value="{{ role }}" {% if (user and user.role == role) or (not user and prefill.get('role', 'Member') == role) %}selected{% endif %}>{{ role }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <label class="check-row">
+                <input name="is_active" type="checkbox" value="1" {% if not user and not prefill %}checked{% elif user and user.is_active %}checked{% elif prefill.get('is_active') %}checked{% endif %}>
+                <span>Kích hoạt tài khoản</span>
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <a class="button" href="{{ url_for('users.index') }}">Hủy</a>
+            <button class="button primary" type="submit">Lưu</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

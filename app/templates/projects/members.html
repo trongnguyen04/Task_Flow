@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}Thành viên dự án - Task Flow{% endblock %}
+
+{% block content %}
+<p class="breadcrumb" style="margin-bottom:8px;">
+    <a href="{{ url_for('projects.index') }}">Dự án</a>
+    &nbsp;&rsaquo;&nbsp;
+    <strong>{{ project.name }}</strong>
+</p>
+
+<section class="section-head">
+    <h1>Quản lý thành viên</h1>
+</section>
+
+<section class="panel">
+    <h2>Thêm thành viên</h2>
+    <form method="post" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <select name="user_id" required>
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.full_name }} · {{ user.role }}</option>
+            {% endfor %}
+        </select>
+        <input name="role_in_project" placeholder="Vai trò trong dự án" value="Member">
+        <button class="button primary" type="submit">Thêm</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Danh sách thành viên</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Họ tên</th><th>Email</th><th>Vai trò hệ thống</th><th>Vai trò dự án</th><th>Thao tác</th></tr></thead>
+            <tbody>
+                {% for member in project.members %}
+                <tr>
+                    <td>{{ member.user.full_name }}</td>
+                    <td>{{ member.user.email }}</td>
+                    <td>{{ member.user.role }}</td>
+                    <td>{{ member.role_in_project }}</td>
+                    <td class="actions-cell">
+                        <button class="icon-button danger confirm-delete-btn" type="button" title="Xóa khỏi dự án"
+                            data-action="{{ url_for('projects.remove_member', project_id=project.id, member_id=member.id) }}"
+                            data-message="Xóa {{ member.user.full_name }} khỏi dự án này?">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6l-1 14H6L5 6"/>
+                                <path d="M10 11v6"/><path d="M14 11v6"/>
+                                <path d="M9 6V4h6v2"/>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="empty">Chưa có thành viên.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

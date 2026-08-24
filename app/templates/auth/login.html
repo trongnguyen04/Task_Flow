@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}Đăng nhập - Task Flow{% endblock %}
+
+{% block content %}
+<section class="auth-panel">
+    <form method="post" class="form-card">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="login-brand">
+            <span class="brand-icon large">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                    <circle cx="6" cy="8" r="2" fill="white"/>
+                    <line x1="11" y1="8" x2="19" y2="8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="6" cy="16" r="2" fill="white"/>
+                    <line x1="11" y1="16" x2="19" y2="16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <h1>Task flow</h1>
+            <p>Quản lý công việc đa dự án</p>
+        </div>
+
+        <div>
+            <h1>Đăng nhập</h1>
+            <p style="color:#6b7280;font-size:13px;margin-top:4px;">Nhập thông tin tài khoản của bạn</p>
+        </div>
+
+        <div>
+            <label for="email">Email</label>
+            <div class="input-icon">
+                <span class="icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                        <path d="M22 7l-10 7L2 7"/>
+                    </svg>
+                </span>
+                <input id="email" name="email" type="email" placeholder="email@example.com" required autofocus>
+            </div>
+        </div>
+
+        <div>
+            <label for="password">Mật khẩu</label>
+            <div class="input-icon">
+                <span class="icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                </span>
+                <input id="password" name="password" type="password" placeholder="Nhập mật khẩu" required>
+            </div>
+        </div>
+
+        <a class="forgot-link" href="{{ url_for('auth.forgot_password') }}">Quên mật khẩu?</a>
+
+        <button class="button primary" type="submit" style="width:100%;min-height:44px;font-size:15px;">Đăng nhập</button>
+    </form>
+</section>
+{% endblock %}

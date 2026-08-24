@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}Thông báo - Task Flow{% endblock %}
+
+{% block content %}
+<section class="section-head">
+    <h1>Thông báo</h1>
+    {% if notifications %}
+    <form method="post" action="{{ url_for('main.mark_all_notifications_read') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="button secondary" type="submit">Đánh dấu đã đọc</button>
+    </form>
+    {% endif %}
+</section>
+
+<section class="panel notification-panel">
+    {% for notification in notifications %}
+    <article class="notification-item{% if not notification.is_read %} unread{% endif %}">
+        <div class="notification-dot"></div>
+        <div class="notification-content">
+            <strong>{{ notification.message }}</strong>
+            {% if notification.task and notification.task.description %}
+            <p class="notification-description">
+                {{ notification.task.description }}
+            </p>
+            {% endif %}
+            {% if notification.task and notification.task.project %}
+            <a href="{{ url_for('main.open_notification', notification_id=notification.id) }}">
+                Xem công việc trong dự án {{ notification.task.project.name }}
+            </a>
+            {% endif %}
+        </div>
+        <div class="notification-meta">
+            <span class="notification-time">{{ notification.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+            {% if not notification.is_read %}
+            <form method="post" action="{{ url_for('main.mark_notification_read', notification_id=notification.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="mark-read-btn" type="submit" title="Đánh dấu đã đọc">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Đã đọc
+                </button>
+            </form>
+            {% else %}
+            <span class="read-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Đã đọc
+            </span>
+            {% endif %}
+        </div>
+    </article>
+    {% else %}
+    <p class="empty">Chưa có thông báo nào.</p>
+    {% endfor %}
+</section>
+
+{% include "partials/pagination.html" %}
+{% endblock %}

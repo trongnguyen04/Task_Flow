@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block title %}Người dùng - Task Flow{% endblock %}
+
+{% block content %}
+<section class="section-head users-section-head">
+    <h1>Quản lý người dùng</h1>
+    <a class="button primary" href="{{ url_for('users.create') }}">+ Tạo tài khoản người dùng</a>
+</section>
+
+<form method="get" style="margin-top:60px;">
+    <div class="search-filter-bar">
+        <div class="search-filter-large">
+            <span>⌕</span>
+            <input name="keyword" placeholder="Tìm tên hoặc email..." value="{{ filters.get('keyword', '') }}">
+        </div>
+        <div class="filter-dropdowns user-filters" style="margin-top:16px;">
+            <select name="role">
+                <option value="">Tất cả vai trò</option>
+                {% for role in roles %}
+                    <option value="{{ role }}" {% if filters.get('role') == role %}selected{% endif %}>{{ role }}</option>
+                {% endfor %}
+            </select>
+            <select name="status">
+                <option value="">Tất cả trạng thái</option>
+                <option value="active" {% if filters.get('status') == 'active' %}selected{% endif %}>Đang hoạt động</option>
+                <option value="inactive" {% if filters.get('status') == 'inactive' %}selected{% endif %}>Đã khóa</option>
+            </select>
+            <button class="button" type="submit">Lọc</button>
+        </div>
+    </div>
+</form>
+
+<section class="panel table-panel">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td style="font-weight:600;">{{ user.full_name }}</td>
+                    <td style="color:var(--muted);">{{ user.email }}</td>
+                    <td><span class="badge">{{ user.role }}</span></td>
+                    <td>
+                        {% if user.is_active %}
+                            <span class="badge status-active">Hoạt động</span>
+                        {% else %}
+                            <span class="badge status-inactive">Đã khóa</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions-cell">
+                        <a class="icon-button" href="{{ url_for('users.edit', user_id=user.id) }}" title="Sửa">✎</a>
+                        {% if user.id != session.get("user_id") %}
+                        <form method="post" action="{{ url_for('users.toggle', user_id=user.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="icon-button danger-text" type="submit" title="Khóa/mở khóa">
+                                {{ "↻" if not user.is_active else "⊘" }}
+                            </button>
+                        </form>
+                        <button class="icon-button danger confirm-delete-btn" type="button" title="Xóa"
+                            data-action="{{ url_for('users.delete', user_id=user.id) }}"
+                            data-message="Xóa người dùng {{ user.full_name }}? Các task liên quan sẽ chuyển về chưa giao.">×</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="empty">Không có người dùng phù hợp.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

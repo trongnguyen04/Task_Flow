@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block title %}Thống kê - Task Flow{% endblock %}
+
+{% block content %}
+<section class="section-head">
+    <h1>Thống kê tiến độ</h1>
+</section>
+
+<div class="tabs">
+    <a class="{% if view != 'multi' %}active{% endif %}" href="{{ url_for('main.dashboard') }}">Tổng quan</a>
+    <a class="{% if view == 'multi' %}active{% endif %}" href="{{ url_for('main.dashboard', view='multi') }}">Tổng quan đa dự án</a>
+</div>
+
+{% if view == "multi" %}
+    {% if critical_alerts %}
+    <section class="critical-alert">
+        <strong>Cảnh báo:</strong>
+        {{ critical_alerts|length }} dự án có task Critical chưa xử lý
+        &mdash;
+        {% for item in critical_alerts %}
+            <a href="{{ url_for('projects.tasks', project_id=item.id) }}">{{ item.name }} ({{ item.critical_open }})</a>{% if not loop.last %}, {% endif %}
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <section class="multi-project-head">
+        <h2>Tiến độ các dự án đang chạy song song</h2>
+        <p>Theo dõi phần trăm hoàn thành, deadline và rủi ro Critical của từng dự án.</p>
+    </section>
+
+    <section class="multi-project-list">
+        {% for project in project_overview %}
+        <article class="project-progress-card">
+            <div class="project-progress-top">
+                <div>
+                    <a href="{{ url_for('projects.tasks', project_id=project.id) }}">{{ project.name }}</a>
+                    {% if project.critical_open %}
+                        <span class="critical-chip">{{ project.critical_open }} Critical</span>
+                    {% endif %}
+                </div>
+                <strong>{{ project.percent }}%</strong>
+            </div>
+
+            <div class="progress-track large">
+                <span style="width: {{ project.percent }}%"></span>
+            </div>
+
+            <p>
+                {% if project.total %}
+                    {{ project.done }}/{{ project.total }} task hoàn thành
+                {% else %}
+                    Chưa có task
+                {% endif %}
+                &middot;
+                Deadline
+                {% if project.deadline %}
+                    {{ project.deadline.strftime('%d/%m/%Y') }}
+                {% else %}
+                    chưa thiết lập
+                {% endif %}
+            </p>
+        </article>
+        {% else %}
+        <section class="panel">
+            <p class="empty">Chưa có dự án đang chạy.</p>
+        </section>
+        {% endfor %}
+    </section>
+{% else %}
+    <section class="stats-grid">
+        <article class="stat"><strong>{{ stats.projects }}</strong><span>Dự án</span></article>
+        <article class="stat"><strong>{{ stats.tasks }}</strong><span>Tổng task</span></article>
+        <article class="stat"><strong>{{ stats.todo }}</strong><span>Todo</span></article>
+        <article class="stat"><strong>{{ stats.doing }}</strong><span>Doing</span></article>
+        <article class="stat"><strong>{{ stats.done }}</strong><span>Done</span></article>
+        <article class="stat{% if stats.overdue %} stat-danger{% endif %}"><strong>{{ stats.overdue }}</strong><span>Quá hạn</span></article>
+    </section>
+
+    <section class="analytics-grid">
+        <article class="panel">
+            <h2>Tiến độ theo dự án</h2>
+            <div class="progress-list">
+                {% for project in project_progress %}
+                <div class="progress-row">
+                    <div>
+                        <span>{{ project.name }}</span>
+                        {% if project.total %}
+                            <strong>{{ project.done }}/{{ project.total }} task hoàn thành - {{ project.percent }}%</strong>
+                        {% else %}
+                            <strong>Chưa có task</strong>
+                        {% endif %}
+                    </div>
+                    <div class="progress-track">
+                        <span style="width: {{ project.percent }}%"></span>
+                    </div>
+                </div>
+                {% else %}
+                <p class="empty">Chưa có dự án.</p>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="panel">
+            <h2>Task theo người phụ trách</h2>
+            <div class="assignee-list">
+                {% for item in assignee_counts %}
+                <div>
+                    <span>{{ item.name }}</span>
+                    <strong style="color:var(--muted);">{{ item.count }} task</strong>
+                </div>
+                {% else %}
+                <p class="empty">Chưa có task được phân công.</p>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="panel priority-panel">
+            <h2>Task theo ưu tiên</h2>
+            {% set _vals = priority_counts.values()|list %}
+            {% set max_count = _vals|max if (_vals and _vals|max > 0) else 1 %}
+            <div class="priority-chart">
+                {% for priority in ["Critical", "High", "Medium", "Low"] %}
+                    {% set count = priority_counts.get(priority, 0) %}
+                    {% set height = [12, (count / max_count * 120)|int]|max %}
+                    <div class="bar-item">
+                        <span class="bar priority-{{ priority|lower }}" style="height: {{ height }}px"></span>
+                        <strong>{{ priority }}</strong>
+                        <small>{{ count }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+{% endif %}
+{% endblock %}

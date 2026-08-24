@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block title %}Task Flow{% endblock %}
+
+{% block content %}
+<div class="landing">
+    <nav class="landing-nav">
+        <a class="brand" href="#">
+            <span class="brand-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle cx="6" cy="8" r="2" fill="white"/>
+                    <line x1="11" y1="8" x2="19" y2="8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="6" cy="16" r="2" fill="white"/>
+                    <line x1="11" y1="16" x2="19" y2="16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <span>Task Flow</span>
+        </a>
+    </nav>
+
+    <div class="landing-hero">
+        <p class="eyebrow">Multi-project Task Management</p>
+        <h1>Quản lý và ưu tiên công việc<br>trong môi trường đa dự án</h1>
+        <p class="landing-sub">
+            Tập trung hóa task, phân công thành viên, theo dõi trạng thái<br>
+            và sắp xếp ưu tiên cho đội ngũ phần mềm có nguồn lực hạn chế.
+        </p>
+        <a class="button primary landing-cta" href="{{ url_for('auth.login') }}">Bắt đầu đăng nhập</a>
+    </div>
+
+    <div class="landing-features">
+        <article class="feature-card">
+            <span class="feature-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+            </span>
+            <h3>Quản lý dự án</h3>
+            <p>Tạo và quản lý nhiều dự án song song, theo dõi tiến độ toàn bộ và phân công thành viên hiệu quả.</p>
+        </article>
+        <article class="feature-card">
+            <span class="feature-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                </svg>
+            </span>
+            <h3>Theo dõi trạng thái</h3>
+            <p>Bảng Kanban trực quan với kéo thả, theo dõi tiến độ công việc từ Todo đến Done theo thời gian thực.</p>
+        </article>
+        <article class="feature-card">
+            <span class="feature-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+            </span>
+            <h3>Thống kê tiến độ</h3>
+            <p>Biểu đồ phân bổ theo mức ưu tiên, theo người phụ trách và phần trăm hoàn thành từng dự án.</p>
+        </article>
+        <article class="feature-card">
+            <span class="feature-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+            </span>
+            <h3>Tìm kiếm &amp; lọc</h3>
+            <p>Lọc công việc theo dự án, ưu tiên, trạng thái và người phụ trách chỉ trong vài giây.</p>
+        </article>
+        <article class="feature-card">
+            <span class="feature-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </span>
+            <h3>Phân công thành viên</h3>
+            <p>Gán công việc cho từng thành viên, quản lý vai trò trong dự án và kiểm soát quyền truy cập.</p>
+        </article>
+        <article class="feature-card">
+            <span class="feature-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+            </span>
+            <h3>Thiết lập ưu tiên</h3>
+            <p>Đánh dấu mức độ ưu tiên Critical, High, Medium, Low giúp nhóm tập trung vào việc quan trọng nhất.</p>
+        </article>
+    </div>
+
+    <footer class="landing-footer">
+        <span>© 2025 Task Flow · Hệ thống quản lý công việc đa dự án</span>
+    </footer>
+</div>
+{% endblock %}

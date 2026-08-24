@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}Không có quyền truy cập - Task Flow{% endblock %}
+
+{% block content %}
+<section style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:16px;">
+    <div style="font-size:72px;font-weight:800;color:var(--line);line-height:1;">403</div>
+    <h1 style="font-size:22px;margin:0;">Không có quyền truy cập</h1>
+    <p style="color:var(--muted);margin:0;max-width:360px;">
+        Bạn không có quyền thực hiện thao tác này. Vui lòng liên hệ Admin nếu cần hỗ trợ.
+    </p>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+        <a class="button" id="goBackBtn" href="#">Quay lại</a>
+        <a class="button primary" href="{{ url_for('main.dashboard') }}">Về trang chủ</a>
+    </div>
+</section>
+<script>
+    document.getElementById("goBackBtn").addEventListener("click", function(e) {
+        e.preventDefault();
+        history.back();
+    });
+</script>
+{% endblock %}

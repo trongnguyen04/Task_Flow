@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+
+{% block title %}Dự án - Task Flow{% endblock %}
+
+{% block content %}
+<section class="section-head">
+    <h1>Quản lý dự án</h1>
+    {% if session.get("user_role") == "Admin" %}
+        <a class="button primary" href="{{ url_for('projects.create') }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Tạo dự án
+        </a>
+    {% endif %}
+</section>
+
+<section class="toolbar">
+    <form method="get" style="display:flex;gap:10px;align-items:center;">
+        <div class="search-box" style="max-width:280px;">
+            <span class="icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+            </span>
+            <input name="keyword" placeholder="Tìm dự án..." value="{{ keyword }}">
+        </div>
+        <select name="status" onchange="this.form.submit()" style="min-height:40px;font-size:19px;">
+            <option value="">Tất cả trạng thái</option>
+            {% for s in project_statuses %}
+                <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</section>
+
+<section class="panel table-panel">
+    <div class="table-wrap">
+        <table>
+            {% set is_admin = session.get("user_role") == "Admin" %}
+            <thead>
+                <tr>
+                    <th>Tên dự án</th>
+                    <th>Trạng thái</th>
+                    <th>Số công việc</th>
+                    <th>Deadline</th>
+                    {% if is_admin %}<th>Thao tác</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('projects.tasks', project_id=project.id) }}" style="font-weight:600;color:var(--text);">
+                            {{ project.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <span class="badge project-status-{{ project.status|lower }}">{{ project.status }}</span>
+                    </td>
+                    <td style="color:var(--muted);">{{ project.visible_task_count if project.visible_task_count is defined else project.tasks|length }} công việc</td>
+                    <td style="color:var(--muted);">
+                        {% if project.end_date %}
+                            {{ project.end_date.strftime('%d/%m/%Y') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    {% if is_admin %}
+                    <td class="actions-cell">
+                        <a class="icon-button" href="{{ url_for('projects.members', project_id=project.id) }}" title="Thành viên">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </a>
+                        <a class="icon-button" href="{{ url_for('projects.edit', project_id=project.id) }}" title="Sửa">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                        </a>
+                        <button class="icon-button danger confirm-delete-btn" type="button" title="Xóa"
+                            data-action="{{ url_for('projects.delete', project_id=project.id) }}"
+                            data-message="Bạn có chắc muốn xóa dự án &quot;{{ project.name }}&quot; không? Tất cả công việc trong dự án cũng sẽ bị xóa.">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6l-1 14H6L5 6"/>
+                                <path d="M10 11v6"/><path d="M14 11v6"/>
+                                <path d="M9 6V4h6v2"/>
+                            </svg>
+                        </button>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr><td colspan="{{ 5 if is_admin else 4 }}" class="empty">Chưa có dự án nào.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% include "partials/pagination.html" %}
+{% endblock %}

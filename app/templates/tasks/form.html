@@ -1,0 +1,143 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ "Sửa công việc" if task else "Tạo công việc" }} - Task Flow{% endblock %}
+
+{% block content %}
+{% set can_manage_task = session.get("user_role") == "Admin" %}
+
+<section class="form-shell">
+    <form method="post" class="form-card wide">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <h1>{{ "Sửa công việc" if task else "Tạo công việc" }}</h1>
+
+        {% if can_manage_task %}
+            <label for="title">Tên công việc <span class="required">*</span></label>
+            <input id="title" name="title" value="{{ task.title if task else '' }}" required>
+
+            <label for="description">Mô tả</label>
+            <textarea id="description" name="description" rows="4">{{ task.description if task else '' }}</textarea>
+        {% else %}
+            <div class="readonly-summary">
+                <span>Task</span>
+                <strong>{{ task.title }}</strong>
+                <p>{{ task.description or "Không có mô tả." }}</p>
+            </div>
+        {% endif %}
+
+        <div class="form-grid">
+            {% if can_manage_task %}
+            <div>
+                <label for="project_id">Dự án</label>
+                {% if locked_project %}
+                <input type="hidden" id="project_id" name="project_id" value="{{ locked_project.id }}">
+                <input value="{{ locked_project.name }}" disabled>
+                {% else %}
+                <select id="project_id" name="project_id" required>
+                    {% for project in projects %}
+                        <option value="{{ project.id }}"
+                            {% if task and task.project_id == project.id %}selected
+                            {% elif not task and default_project_id == project.id %}selected
+                            {% endif %}>{{ project.name }}</option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+            </div>
+            <div>
+                <label for="priority">Ưu tiên</label>
+                <select id="priority" name="priority">
+                    {% for priority in priorities %}
+                        <option value="{{ priority }}" {% if task and task.priority == priority %}selected{% endif %}>{{ priority }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% else %}
+            <div>
+                <label>Dự án</label>
+                <input value="{{ task.project.name }}" disabled>
+            </div>
+            <div>
+                <label>Ưu tiên</label>
+                <input value="{{ task.priority }}" disabled>
+            </div>
+            {% endif %}
+
+            <div>
+                <label for="status">Trạng thái</label>
+                <select id="status" name="status">
+                    {% for status in statuses %}
+                        <option value="{{ status }}" {% if task and task.status == status %}selected{% endif %}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% if can_manage_task %}
+            <div>
+                <label for="assignee_id">Người phụ trách <span class="required">*</span></label>
+                <select id="assignee_id" name="assignee_id" required>
+                    <option value="">Chọn người phụ trách</option>
+                    {% for user in users %}
+                        <option value="{{ user.id }}" {% if task and task.assignee_id == user.id %}selected{% endif %}>{{ user.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="due_date">Hạn xử lý <span class="required">*</span></label>
+                <input id="due_date" name="due_date" type="date" value="{{ task.due_date if task and task.due_date else '' }}" required>
+            </div>
+            {% else %}
+            <div>
+                <label>Người phụ trách</label>
+                <input value="{{ task.assignee.full_name if task.assignee else 'Chưa giao' }}" disabled>
+            </div>
+            <div>
+                <label>Hạn xử lý</label>
+                <input value="{{ task.due_date or '-' }}" disabled>
+            </div>
+            {% endif %}
+        </div>
+
+        <input type="hidden" name="back_url" value="{{ back_url }}">
+        <div class="form-actions">
+            <a class="button" href="{{ back_url }}">Hủy</a>
+            <button class="button primary" type="submit">Lưu</button>
+        </div>
+    </form>
+</section>
+
+{% if task and history %}
+<section class="form-shell" id="history">
+    <div class="form-card wide">
+        <h2 style="margin-top:0;">Lịch sử thay đổi</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Trường</th>
+                    <th>Giá trị cũ</th>
+                    <th>Giá trị mới</th>
+                    <th>Người thay đổi</th>
+                    <th>Thời gian</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in history %}
+                <tr>
+                    <td>{{ h.field }}</td>
+                    <td class="text-muted">{{ h.old_value or "—" }}</td>
+                    <td>{{ h.new_value or "—" }}</td>
+                    <td>{{ h.changed_by.full_name if h.changed_by else "—" }}</td>
+                    <td>{{ h.changed_at.strftime("%d/%m/%Y %H:%M") }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
+
+<script>
+    const dueDateInput = document.getElementById("due_date");
+    if (dueDateInput) {
+        dueDateInput.min = new Date().toISOString().split("T")[0];
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}Trạng thái công việc - Task Flow{% endblock %}
+
+{% block content %}
+<section class="section-head">
+    <div>
+        {% if current_project %}
+            <p class="breadcrumb">Dự án &nbsp;&rsaquo;&nbsp; <strong>{{ current_project.name }}</strong></p>
+        {% endif %}
+        <h1>Theo dõi trạng thái công việc</h1>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+        <form method="get" style="display:flex;align-items:center;gap:8px;">
+            <select name="project_id" onchange="this.form.submit()" style="min-height:36px;width:180px;font-size:13px;">
+                <option value="">Tất cả dự án</option>
+                {% for project in projects %}
+                    <option value="{{ project.id }}" {% if current_project and current_project.id == project.id %}selected{% endif %}>{{ project.name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+</section>
+
+<p class="kanban-subtitle">Kéo thả để cập nhật trạng thái</p>
+
+<div class="kanban-board">
+    {% for status_label, status_key in kanban_statuses %}
+    {% set task_list = grouped[status_label] %}
+    <div class="kanban-col" data-total-count="{{ status_counts.get(status_label, 0) }}">
+        <div class="kanban-col-header">
+            <div class="kanban-col-title">
+                <span class="status-dot {{ status_key }}"></span>
+                <span {% if status_key == 'doing' %}style="color:#3b82f6;"{% elif status_key == 'done' %}style="color:#10b981;"{% endif %}>{{ status_label }}</span>
+            </div>
+            <span class="kanban-count">{{ status_counts.get(status_label, 0) }}</span>
+        </div>
+        <div class="kanban-cards" data-status="{{ status_label }}">
+            {% for task in task_list %}
+            {% set can_drag = session.get('user_role') == 'Admin' or task.assignee_id == session.get('user_id') %}
+            <div class="kanban-card{% if not can_drag %} no-drag{% endif %}" {% if can_drag %}draggable="true"{% endif %} data-task-id="{{ task.id }}">
+                <div class="kanban-card-title">{{ task.title }}</div>
+                {% if task.due_date %}
+                <div class="kanban-due{% if task.due_date < today_date and task.status != 'Done' %} overdue{% endif %}">
+                    {{ task.due_date.strftime('%d/%m/%Y') }}
+                </div>
+                {% endif %}
+                <div class="kanban-card-footer">
+                    <span class="badge-solid priority-{{ task.priority|lower }}">{{ task.priority }}</span>
+                    {% if task.assignee %}
+                        <span class="avatar" title="{{ task.assignee.full_name }}">
+                            {{ (task.assignee.full_name.split() or ['?'])[-1][0] }}
+                        </span>
+                    {% else %}
+                        <span class="avatar" title="Chưa giao" style="background:#f1f5f9;color:#9ca3af;">?</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p class="kanban-empty">Không có công việc ở trang này.</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="kanban-pagination kanban-pagination-shared">
+    {% include "partials/pagination.html" %}
+</div>
+{% endblock %}
