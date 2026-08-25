@@ -5,3 +5,4 @@ PyMySQL==1.1.1
 python-dotenv==1.1.0
 cryptography==45.0.4
 mysql-connector-python==9.1.0
+gunicorn
